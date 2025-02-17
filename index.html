@@ -156,7 +156,10 @@
         @submit.prevent=""
         class="mb-4 flex w-full flex-wrap"
       >
-        <div class="w-min-1/4 flex items-center p-2">
+        <div
+          class="w-min-1/4 flex items-center p-2"
+          x-show="!searchForm.qPreset.selected.startsWith('List ')"
+        >
           <button
             class="btn btn-ghost btn-circle"
             @click="searchForm.q=''; $refs.searchForm_q.focus()"
@@ -170,11 +173,14 @@
             @input.debounce="performSearch()"
             autocomplete="off"
             placeholder="Search..."
-            class="input input-bordered border-base-300 w-full max-w-xs"
+            class="input input-primary"
           />
         </div>
 
-        <div class="flex items-center p-2">
+        <div
+          class="flex items-center p-2"
+          x-show="!searchForm.qPreset.selected.startsWith('List ')"
+        >
           <label class="label cursor-pointer" title="([*?%_] supported)">
             <input
               type="checkbox"
@@ -200,7 +206,7 @@
             @input.debounce="performSearch()"
             autocomplete="off"
             placeholder="And not like..."
-            class="input input-bordered border-base-300 w-full max-w-xs"
+            class="input input-error"
           />
         </div>
 
@@ -208,7 +214,7 @@
           <select
             x-model="searchForm.qPreset.selected"
             @change="performSearch()"
-            class="select select-bordered border-base-300 w-full max-w-xs"
+            class="select select-primary"
           >
             <option value="" disabled>----</option>
             <template
@@ -229,7 +235,7 @@
         </div>
 
         <div
-          x-show="searchForm.qPreset.selected == 'ListSearch'"
+          x-show="searchForm.qPreset.selected.startsWith('List ')"
           class="w-full"
         >
           <a @click="showList = !showList" class="link link-primary">
@@ -238,7 +244,7 @@
           <div x-show="showList" class="mb-4">
             <textarea
               x-model="searchForm.qList"
-              class="textarea textarea-bordered border-base-300 w-full text-xs"
+              class="textarea textarea-primary text-xs"
             ></textarea>
           </div>
         </div>
