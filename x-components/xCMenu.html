@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<!-- xCMenu -->
+<!-- Contextual menu in Alpine.js for clicking on a data table -->
+<div
+class="absolute card bg-base-100 !opacity-100 text-base-content border-2 border-primary drop-shadow-lg shadow-primary cursor-pointer select-none text-xs whitespace-nowrap z-10"
+  id="xCMenu"
+  @click.outside="xCMenu.isOpen=false"
+  :style="{top: xCMenu.top+'px', left: xCMenu.left+'px'}"
+  x-show="xCMenu.isOpen"
+>
+  <div class="w-full">
+    <template x-for="item in xCMenu.items">
+      <div
+        class="group h-8 hover:bg-base-200 hover:text-primary flex items-center space-x-1 px-1"
+        @click="item.html ? '' : xCMenu_exec(item.name, xCMenu.row) /* latest clicked row on table */ "
+      >
+        <!-- TODO? @class="separator && border-t" -->
+        <!-- TODO? x-show="!item.hidden" -->
+        <div
+          class="h-6 w-6 grid place-content-center"
+          x-html="item.icon || ''"
+        ></div>
+        <div
+          class="flex items-center space-x-1 p-1"
+          x-html="item.html ? item.html : item.name"
+        ></div>
+      </div>
+    </template>
+  </div>
+</div>

@@ -1,0 +1,20 @@
+npm i alpinejs @alpinejs/focus @alpinejs/persist
+npm i copy-text-to-clipboard 
+npm i iconify-icon
+
+npm install -D tailwindcss @tailwindcss/postcss postcss
+npm install -D postcss-loader
+npm install -D laravel-mix
+
+npm i -D daisyui@beta
+# npm i -D daisyui@latest
+
+npm i prismjs
+npm i babel-plugin-prismjs
+
+# === VS Code configuration ===
+# 
+# https://github.com/tailwindlabs/prettier-plugin-tailwindcss
+
+# === Build ===
+npx mix build --production

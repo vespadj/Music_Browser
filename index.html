@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en" class="bg-base-100">
+  <head>
+    <meta charset="UTF-8" />
+    <meta content="vespadj" name="author" />
+    <meta content="2.0" name="version" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Music Browser - File Search - vespadj</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=" />
+
+    <link href="src/styles.css" rel="stylesheet" />
+    <script type="module" src="src/main.js"></script>
+
+    <script src="app.js"></script>
+    <script src="x-components/xCMenu.js"></script>
+    <style>
+      [x-cloak] {
+        display: none !important;
+      }
+    </style>
+  </head>
+
+  <body
+    x-data="musicBrowser"
+    class="bg-base-100 min-h-screen min-w-screen text-sm"
+    bak-cloak
+    x-bind:data-theme="$store.theme.current"
+  >
+    <!-- Dependencies -->
+    <script>
+      const base_path = document.location.pathname.substring(
+        0,
+        document.location.pathname.lastIndexOf('/')
+      )
+      fetch('mix-manifest.json?' + Date.now())
+        .then((x) => x.json())
+        .then((json) => {
+          links = Object.values(json).filter((txt) => txt.indexOf('.css') > 0)
+          scripts = Object.values(json).filter((txt) => txt.indexOf('.js') > 0)
+          links.forEach((element) => {
+            var link = document.createElement('link')
+            link.rel = 'stylesheet'
+            link.href = base_path + element
+            document.body.appendChild(link)
+          })
+          scripts.forEach((element) => {
+            if (!['tinymce'].includes(element)) {
+              var script = document.createElement('script')
+              script.deref = true
+              script.src = base_path + element
+              document.body.appendChild(script)
+            }
+          })
+        })
+    </script>
+
+    <div id="top" class="bg-primary text-primary-content px-4 py-2">
+      <div id="nav" class="flex items-center justify-between">
+        <a href="../index.html" class="link link-hover">&#0171; index</a>
+        <span class="font-bold">Music Browser</span>
+        <a @click="showOptionsBox = !showOptionsBox" class="link link-hover"
+          ><iconify-icon icon="mdi:settings" width="1.2rem"></iconify-icon
+        ></a>
+      </div>
+
+      <div id="options" class="flex flex-col items-center justify-end">
+        <div
+          x-show="showOptionsBox"
+          @click.away="showOptionsBox = false"
+          class="card bg-base-200 text-base-content border-base-300 right-0 mt-2 space-y-1 space-x-1 border p-4"
+        >
+          <!-- # Theme switcher -->
+          <div class="flex w-full items-center gap-2">
+            <iconify-icon
+              icon="mdi:palette-swatch-variant"
+              width="1.2rem"
+            ></iconify-icon>
+            <select
+              class="select select-sm select-bordered border-base-300 flex-1"
+              x-model="$store.theme.current"
+            >
+              <template x-for="theme in $store.theme.options">
+                <option :value="theme" x-text="theme"></option>
+              </template>
+            </select>
+          </div>
+          <form id="options" name="options" method="post" @submit.prevent="">
+            <div>Tracks in db: <span x-text="dbTracksCount"></span></div>
+            <div class="pre_wrap text-xs">
+              <span x-text="statusMessage"></span>
+            </div>
+            <div class="form-control">
+              <label class="label">Redefine Root:</label>
+              <input
+                type="text"
+                x-model="rootOld"
+                title="Old Root"
+                class="input input-bordered input-sm border-base-300"
+              />
+              <input
+                type="text"
+                x-model="rootNew"
+                title="New Root"
+                class="input input-bordered input-sm border-base-300 mt-1"
+              />
+            </div>
+            <div class="form-control">
+              <label class="label cursor-pointer">
+                <span class="label-text">dndf</span>
+                <input
+                  type="checkbox"
+                  x-model="$store.dndf.on"
+                  class="checkbox checkbox-primary"
+                />
+              </label>
+              <label class="label cursor-pointer">
+                <span class="label-text">Show Debug sql</span>
+                <input
+                  type="checkbox"
+                  x-model="options.debug_sql_on"
+                  class="checkbox checkbox-primary"
+                />
+              </label>
+              <label class="label cursor-pointer">
+                <span class="label-text">Show Print buttons</span>
+                <input
+                  type="checkbox"
+                  x-model="options.print_btn_on"
+                  class="checkbox checkbox-primary"
+                />
+              </label>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="mx-2">
+      <form
+        id="mainSearch"
+        name="mainSearch"
+        method="post"
+        @submit.prevent=""
+        class="mb-4 flex w-full flex-wrap"
+      >
+        <div class="w-min-1/4 flex items-center p-2">
+          <button
+            class="btn btn-ghost btn-circle"
+            @click="searchForm.q=''; $refs.searchForm_q.focus()"
+          >
+            <iconify-icon icon="mdi:eraser" width="1.2rem"></iconify-icon>
+          </button>
+
+          <input
+            x-model="searchForm.q"
+            x-ref="searchForm_q"
+            @input.debounce="performSearch()"
+            autocomplete="off"
+            placeholder="Search..."
+            class="input input-bordered border-base-300 w-full max-w-xs"
+          />
+        </div>
+
+        <div class="flex items-center p-2">
+          <label class="label cursor-pointer" title="([*?%_] supported)">
+            <input
+              type="checkbox"
+              x-model="searchForm.qExact"
+              class="checkbox checkbox-sm checkbox-primary mr-2"
+            />
+            <span class="label-text">Exact search</span>
+          </label>
+        </div>
+
+        <div class="w-min-1/4 flex items-center p-2">
+          <label class="label" for="searchForm_qNot">And not like:</label>
+          <button
+            class="btn btn-ghost btn-circle mx-2"
+            @click="searchForm.qNot=''; $refs.searchForm_qNot.focus()"
+          >
+            <iconify-icon icon="mdi:eraser" width="1.2rem"></iconify-icon>
+          </button>
+          <input
+            x-model="searchForm.qNot"
+            id="searchForm_qNot"
+            x-ref="searchForm_qNot"
+            @input.debounce="performSearch()"
+            autocomplete="off"
+            placeholder="And not like..."
+            class="input input-bordered border-base-300 w-full max-w-xs"
+          />
+        </div>
+
+        <div class="w-min-1/4 flex items-center p-2">
+          <select
+            x-model="searchForm.qPreset.selected"
+            @change="performSearch()"
+            class="select select-bordered border-base-300 w-full max-w-xs"
+          >
+            <option value="" disabled>----</option>
+            <template
+              x-for="option in searchForm.qPreset.options"
+              :key="option.value"
+            >
+              <option
+                :selected="option.value==searchForm.qPreset.selected"
+                :title="option.title"
+                :value="option.value"
+                x-text="option.value"
+              ></option>
+            </template>
+          </select>
+          <button @click="performSearch()" class="btn btn-primary ml-2">
+            Search
+          </button>
+        </div>
+
+        <div
+          x-show="searchForm.qPreset.selected == 'ListSearch'"
+          class="w-full"
+        >
+          <a @click="showList = !showList" class="link link-primary">
+            List ->
+          </a>
+          <div x-show="showList" class="mb-4">
+            <textarea
+              x-model="searchForm.qList"
+              class="textarea textarea-bordered border-base-300 w-full text-xs"
+            ></textarea>
+          </div>
+        </div>
+      </form>
+
+      <!-- Results table -->
+      <div id="div_results" x-data="xCMenu">
+        <template x-if="results.length">
+          <div
+            id="results"
+            x-data="{ table: results, fields: [], suffixFields: [] }"
+            x-init="fields = results_fields; 
+                      suffixFields = fields.filter((el) => !defaultFields.includes(el));
+                      $watch('results', (new_val) => {
+                        if(new_val.length){
+                          table = new_val;
+                          fields = results_fields;
+                        }});"
+          >
+            <table class="table-zebra border-base-300 table w-full border">
+              <thead>
+                <tr class="bg-base-200 border-base-300 border-b">
+                  <template x-for="field in fields" :key="field">
+                    <th class="border-base-300 border-r" x-text="field"></th>
+                  </template>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="(row, index) in table" :key="row.id">
+                  <tr
+                    class="hover:bg-base-200 border-base-300 border-b"
+                    @click="xCMenu_open($event, row, 'music_track')"
+                  >
+                    <template x-for="field in fields" :key="field">
+                      <td
+                        class="border-base-300 border-r"
+                        x-text="row[field]"
+                      ></td>
+                    </template>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </template>
+
+        <div x-html="xCMenu.html"></div>
+      </div>
+
+      <p id="cont" class="mt-4">
+        Results found:
+        <strong>
+          <span
+            x-show="results.length != 50"
+            x-text="results.length || 0"
+          ></span>
+          <span x-show="results.length == 50" x-text="'first 50'"></span>
+        </strong>
+      </p>
+
+      <div x-show="options.debug_sql_on && dbg">
+        <a @click="toggleDebugSql()" class="link link-primary">Debug sql</a>
+        <div id="dbg_sql" x-show="showDebugSql">
+          <pre
+            class="border-base-300 border"
+          ><code class="language-sql" x-text="dbg" x-init="$watch('dbg', value => Prism.highlightAll())"></code></pre>
+        </div>
+      </div>
+
+      <div x-show="options.print_btn_on">
+        <div x-show="results.length" class="mt-2 space-x-2">
+          <button class="btn btn-primary" @click="printURLs()">
+            Print URLs
+          </button>
+          <button class="btn btn-primary" @click="printArtistTitle()">
+            Print Artist Title
+          </button>
+          <button
+            class="btn btn-primary"
+            x-show="printBox_html.substr(0, 5)"
+            @click="printBox_html = ''"
+          >
+            Clear
+          </button>
+        </div>
+        <p x-ref="printBox" x-html="printBox_html" class="mt-4"></p>
+      </div>
+
+      <!-- #Player -->
+      <div
+        id="bigplayer"
+        x-data="{show: false, isPlaying: false, coverArt: '', artist: '', title: '', url_media: '', isCached: ''}"
+        x-init="$watch('player.current', (new_val) => {
+             url_media = new_val.url_media;
+             artist = new_val.artist;
+             title = new_val.title;
+           })"
+        class="card bg-base-100 border-primary fixed right-0 bottom-0 border-2 shadow-lg"
+      >
+        <div class="card-body p-2">
+          <div class="flex items-center space-x-2" x-show="!show">
+            <button
+              @click="isPlaying ? $refs.audio.pause() : $refs.audio.play(); isPlaying = !isPlaying"
+              class="btn btn-circle btn-ghost"
+              :class="isPlaying ? 'text-success' : 'text-primary'"
+            >
+              <iconify-icon icon="mdi:play-pause" width="1.5rem"></iconify-icon>
+            </button>
+            <button @click="show=true" class="btn btn-circle btn-ghost">
+              <iconify-icon
+                icon="mdi:window-maximize"
+                width="1.5rem"
+              ></iconify-icon>
+            </button>
+          </div>
+
+          <div class="space-y-2" x-show="show">
+            <div class="flex items-center justify-between">
+              <img :src="coverArt" alt="" class="h-16" />
+              <button @click="show=false" class="btn btn-circle btn-ghost">
+                <iconify-icon icon="mdi:close" width="1.5rem"></iconify-icon>
+              </button>
+            </div>
+
+            <div class="text-xs">
+              <p>
+                <span x-text="artist"></span> - <span x-text="title"></span>
+              </p>
+              <div class="flex items-center space-x-2">
+                <button class="btn btn-circle btn-ghost btn-sm">
+                  <iconify-icon
+                    icon="mdi:skip-previous"
+                    width="1.2rem"
+                  ></iconify-icon>
+                </button>
+                <button class="btn btn-circle btn-ghost btn-sm">
+                  <iconify-icon
+                    icon="mdi:skip-next"
+                    width="1.2rem"
+                  ></iconify-icon>
+                </button>
+                <audio
+                  x-ref="audio"
+                  class="h-8 w-full"
+                  controls
+                  :src="url_media"
+                  @ended="onEnd()"
+                  @canplaythrough="$el.play()"
+                  @timeupdate="isPlaying = !$el.paused"
+                ></audio>
+              </div>
+              <p class="text-base-content/70 mt-1" x-text="url_media"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
