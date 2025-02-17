@@ -1,7 +1,3 @@
-// import {
-//     default as copyTextToClipboard
-// } from "copy-text-to-clipboard";
-
 // Global
 document.addEventListener("alpine:init", () => {
   Alpine.data("xCMenu", () => ({
@@ -16,48 +12,7 @@ document.addEventListener("alpine:init", () => {
       alert(msg) {
         alert(msg); // test
       },
-      items: [
-        {
-          name: "test",
-          icon: "todo",
-          html: "<span>inner html test</span>",
-        },
-
-        {
-          name: "Play here",
-          exec: (row, app) => {
-            app.player.current = row;
-            app.player.current.url_media =
-              "/media/" + row.url.slice(app.rootNew.length);
-          },
-        },
-
-        {
-          name: "Add to Winamp",
-          exec: (row) => {
-            fetch(
-              "action.lsp?action=AddWinamp&url=" + encodeURIComponent(row.url)
-            );
-          },
-        },
-
-        {
-          name: "Copy Artist - Title",
-          exec: (row) => {
-            let a = row.artist || "";
-            let t = row.title || "";
-            let j = a ? " - " : "";
-            j = t ? j : "";
-            copyTextToClipboard(a + j + t);
-          },
-        },
-        {
-          name: "Copy File Path (server)",
-          exec: (row) => {
-            copyTextToClipboard(row.url);
-          },
-        },
-      ], // TODO: Add icon, title, permessi, ...
+      items: [], // Populated by xCMenu_getItemsByField(field)
     },
 
     // Functions

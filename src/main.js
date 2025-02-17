@@ -6,7 +6,7 @@ const daisyuiThemes = [
     "corporate",
     "cmyk",
     "emerald",
-    "pastel",
+    // "pastel", // bad contrast in xCMenu
     "light",
     "dark",
     "abyss",

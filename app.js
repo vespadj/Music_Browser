@@ -8,7 +8,7 @@ function xCMenu_getItemsByField(field) {
 
   if (['music_track'].includes(field.toLowerCase())) {
     // TODO: fix - for Windows.
-    if (Alpine.store('dndf') && Alpine.store('dndf').on) {
+    if (false && Alpine.store('dndf') && Alpine.store('dndf').on) {
       items.push({
         name: 'dndf',
       })
@@ -28,7 +28,7 @@ function xCMenu_getItemsByField(field) {
       exec: (row, app) => {
         app.player.current = row
         app.player.current.url_media =
-          '/media/' + row.url.slice(app.rootNew.length)
+          '/media' + row.url.slice(app.rootNew.length)
       },
     })
 
@@ -54,24 +54,29 @@ function xCMenu_getItemsByField(field) {
       },
     })
 
-    items.push({
-      name: 'Add to Winamp',
-      icon: '<iconify-icon icon="mdi:lightning-bolt-outline" width="1rem" height="1rem"></iconify-icon>',
-      exec: (row) => {
-        fetch('action.lsp?action=AddWinamp&url=' + encodeURIComponent(row.url))
-      },
-    })
+    // TODO: Optimize OS Players
+    if (false) {
+      items.push({
+        name: 'Add to Winamp',
+        icon: '<iconify-icon icon="mdi:lightning-bolt-outline" width="1rem" height="1rem"></iconify-icon>',
+        exec: (row) => {
+          fetch(
+            'action.lsp?action=AddWinamp&url=' + encodeURIComponent(row.url)
+          )
+        },
+      })
 
-    items.push({
-      name: 'Add to Winamp And Play',
-      icon: '<iconify-icon icon="mdi:lightning-bolt-circle" width="1rem" height="1rem"></iconify-icon>',
-      exec: (row) => {
-        fetch(
-          'action.lsp?action=AddWinampAndPlay&url=' +
-            encodeURIComponent(row.url)
-        )
-      },
-    })
+      items.push({
+        name: 'Add to Winamp And Play',
+        icon: '<iconify-icon icon="mdi:lightning-bolt-circle" width="1rem" height="1rem"></iconify-icon>',
+        exec: (row) => {
+          fetch(
+            'action.lsp?action=AddWinampAndPlay&url=' +
+              encodeURIComponent(row.url)
+          )
+        },
+      })
+    }
 
     items.push({
       name: 'Copy Artist - Title',
@@ -110,8 +115,8 @@ document.addEventListener('alpine:init', () => {
     on: Alpine.$persist(false).as('dndf_on'),
   })
   Alpine.store('theme', {
+    current: Alpine.$persist('light').as('theme_current'),
     options: daisyuiThemes,
-    current: Alpine.$persist('light').as('theme'),
   })
 
   Alpine.data('musicBrowser', function () {
@@ -129,11 +134,8 @@ document.addEventListener('alpine:init', () => {
       inputTimeOut: null,
       presetQuery: '',
       presetQueries: [],
-      rootOld: '/media/vespa/XDrive/',
-      rootNew: '/media/vespa/XDrive/',
-      // rootNew: this.$persist("X:\\"),
-      // rootOld: "X:\\",
-      // rootNew: "/media/vespa/XDrive/",
+      rootOld: '', // see init()
+      rootNew: this.$persist(this.rootOld).as('rootNew'),
       showOptionsBox: false,
       dbg: '',
       printBox_html: '',
@@ -198,6 +200,8 @@ document.addEventListener('alpine:init', () => {
               alert('Your database is empty.\nTODO!!!')
               this.openSettings()
             }
+            this.rootOld = response.media_directory.tab[0].directory
+            this.rootNew = this.rootNew || this.rootOld
           })
       },
       openSettings() {

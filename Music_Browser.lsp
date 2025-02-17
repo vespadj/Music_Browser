@@ -4,8 +4,6 @@
 
 -- === Constants and Configuration ===
 
-local WWW_MEDIA_PATH = "/media/vespa/XDrive/"
-
 -- trace(pathname) -- Music_Browser/Music_Browser.lsp
 -- Get "Music_Browser/" from "Music_Browser/Music_Browser.lsp":
 local BASE_PATH = string.sub(pathname, 1, string.find(pathname, "/[^/]*$"))
@@ -23,16 +21,6 @@ if mako.execpath then
   else
     os_name = "Linux"
   end
-end
-
--- === Initialize Media Path ===
-if not page.wwwmedia then
-  local MEDIA_NAME = "media"
-  page.wwwmedia = ba.create.resrdr(MEDIA_NAME, ba.mkio(ba.openio("disk"), WWW_MEDIA_PATH))
-  local appenv = setmetatable({io=io,dir=dir},{__index=_G})
-  page.wwwmedia:lspfilter(appenv)
-  page.wwwmedia:insert()
-  trace('Loaded "'..WWW_MEDIA_PATH..'" as "'..MEDIA_NAME..'".')
 end
 
 -- === Query State ===
@@ -127,6 +115,9 @@ local function tab(strConnDb, sqlfile, style, sql_params)
 end
 
 -- === Main Functions ===
+-- TODO: multiple directories support
+local WWW_MEDIA_PATH = tab("mixxx", CUR_DIR .. "sql_admin/directories.sql", "json", "")
+
 function scanSqlFiles()
   q.qPreset.options = {}
   local i = 0
@@ -145,7 +136,7 @@ end
 function init()
   scanSqlFiles()
   local count = tab("mixxx", CUR_DIR .. "sql_admin/tracks_count.sql", "json", "")
-  return json.encode({init = q, count = count})
+  return json.encode({init = q, count = count, media_directory = WWW_MEDIA_PATH})
 end
 
 -- Perform search and return JSON
@@ -184,6 +175,16 @@ function searchJSON()
   end
   
   return jsonOut
+end
+
+-- === Initialize Media Path ===
+if not page.wwwmedia then
+  local MEDIA_NAME = "media"
+  page.wwwmedia = ba.create.resrdr(MEDIA_NAME, ba.mkio(ba.openio("disk"), WWW_MEDIA_PATH.tab[1].directory))
+  local appenv = setmetatable({io=io,dir=dir},{__index=_G})
+  page.wwwmedia:lspfilter(appenv)
+  page.wwwmedia:insert()
+  trace('Loaded "'..WWW_MEDIA_PATH.tab[1].directory..'" as "'..MEDIA_NAME..'".')
 end
 
 -- === Request Handler ===

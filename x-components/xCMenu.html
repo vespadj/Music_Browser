@@ -1,30 +1,25 @@
-<!DOCTYPE html>
+<!doctype html>
 <!-- xCMenu -->
 <!-- Contextual menu in Alpine.js for clicking on a data table -->
+
 <div
-class="absolute card bg-base-100 !opacity-100 text-base-content border-2 border-primary drop-shadow-lg shadow-primary cursor-pointer select-none text-xs whitespace-nowrap z-10"
+  class="card menu bg-base-100 border-primary shadow-primary absolute z-10 border-2 text-xs !opacity-100 drop-shadow-lg select-none"
   id="xCMenu"
   @click.outside="xCMenu.isOpen=false"
   :style="{top: xCMenu.top+'px', left: xCMenu.left+'px'}"
   x-show="xCMenu.isOpen"
 >
-  <div class="w-full">
+  <ul class="p-0">
     <template x-for="item in xCMenu.items">
-      <div
-        class="group h-8 hover:bg-base-200 hover:text-primary flex items-center space-x-1 px-1"
-        @click="item.html ? '' : xCMenu_exec(item.name, xCMenu.row) /* latest clicked row on table */ "
-      >
-        <!-- TODO? @class="separator && border-t" -->
-        <!-- TODO? x-show="!item.hidden" -->
-        <div
-          class="h-6 w-6 grid place-content-center"
-          x-html="item.icon || ''"
-        ></div>
-        <div
-          class="flex items-center space-x-1 p-1"
-          x-html="item.html ? item.html : item.name"
-        ></div>
-      </div>
+      <li>
+        <a
+          class="text-base-content hover:text-primary flex items-center"
+          @click="item.html ? '' : xCMenu_exec(item.name, xCMenu.row)"
+        >
+          <span class="w-6" x-html="item.icon || ''"></span>
+          <span x-html="item.html ? item.html : item.name"></span>
+        </a>
+      </li>
     </template>
-  </div>
+  </ul>
 </div>

@@ -1,8 +1,10 @@
 @import 'tailwindcss';
 @plugin "daisyui" {
   themes:
-    corporate, cmyk, emerald, pastel, light, dark, abyss, business, dim,
+    corporate, cmyk, emerald, light, dark, abyss, business, dim,
     dracula, forest, sunset;
 }
 /* ! "daisyuiThemes" must be defined also in src/main.js */
-
+/* not good:
+pastel    bad rendering for xCMenu
+*/
