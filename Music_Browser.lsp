@@ -141,6 +141,12 @@ end
 
 -- Perform search and return JSON
 function searchJSON()
+  -- Discard if no query
+  if not(q.q ~= "" or (q.qList ~= "" and string.match(q.qPreset.selected, "^List"))) then
+    jsonOut.dbg = "No query"
+    return jsonOut -- return empty JSON
+  end
+  
   if q.q ~= "" then
     if q.qExact == "false" then
       q.q = q.q:gsub("[^?A-Za-z0-9]", "%%")

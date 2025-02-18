@@ -135,7 +135,7 @@ document.addEventListener('alpine:init', () => {
       presetQuery: '',
       presetQueries: [],
       rootOld: '', // see init()
-      rootNew: this.$persist(this.rootOld).as('rootNew'),
+      rootNew: this.$persist(this.rootOld || '').as('rootNew'),
       showOptionsBox: false,
       dbg: '',
       printBox_html: '',
@@ -201,7 +201,7 @@ document.addEventListener('alpine:init', () => {
               this.openSettings()
             }
             this.rootOld = response.media_directory.tab[0].directory
-            this.rootNew = this.rootNew || this.rootOld
+            this.rootNew = this.rootNew || this.rootOld || ''
           })
       },
       openSettings() {
@@ -215,7 +215,6 @@ document.addEventListener('alpine:init', () => {
         const options = this.options
         // alert(`{"q":"${f.q}","qNot":"${f.qNot}","qExact":"${f.qExact}","qPreset":"${f.qPreset.selected}"}`);
         let uri_qList = encodeURI(f.qList)
-        // Esegui la ricerca con fetch
         fetch(
           'Music_Browser' +
             ext +
@@ -232,32 +231,40 @@ document.addEventListener('alpine:init', () => {
         )
           .then((response) => {
             if (!response.ok) {
-              throw new Error('Errore nella richiesta AJAX')
+              throw new Error('AJAX request error')
+              // TODO: Add error details in the thrown error message for better debugging
             }
             return response.json()
           })
           .then((data) => {
             this.dbg = data.dbg
 
-            // TODO: redo
-            // Aggiorna la tabella dei risultati, ecc.
+            if (!data.results && !data.results.thead) {
+              console.log('Malformed data.results.thead:', data.results.thead)
+              return
+            }
+
+            // Update results table and related elements
             this.results_fields = data.results.thead
-            // Modifica url
             if (data.results.tab.length) {
               data.results.tab.forEach((row) => {
-                row.url = this.formatUrl(row.url)
+                if (row.url) {
+                  row.url = this.formatUrl(row.url)
+                }
                 row.filedate = this.formatDate(row.filedate)
               })
             }
             this.results = data.results.tab
           })
           .catch((error) => {
-            // Gestisci eventuali errori
+            // Handle potential errors
+            // TODO: Add proper error handling and user feedback mechanism
             console.error(error)
           })
       },
       formatDate(date) {
-        // La funzione di umanizzazione rimane la stessa
+        // Humanization function remains the same
+        // TODO: Add date validation - current implementation may throw on invalid date strings
         const parsedDate = new Date(date)
         const dd = String(parsedDate.getDate()).padStart(2, '0')
         const mm = String(parsedDate.getMonth() + 1).padStart(2, '0') // 0-based
@@ -269,13 +276,13 @@ document.addEventListener('alpine:init', () => {
         return `${yyyy}/${mm}/${dd} ${hh}:${min}` // :${ss}
       },
       formatUrl(urltxt) {
+        // TODO: Add validation for this.rootOld and this.rootNew before string replacement
         let url = urltxt.replace(this.rootOld, this.rootNew)
         let txt = urltxt.replace(this.rootOld, this.rootNew)
         if (this.rootNew[0] === '/') {
           // Linux path
           txt = txt.replaceAll('\\', '/')
         }
-        // return `<a href=${url}>${txt}<a>`;
         return txt
       },
       toggleDebugSql() {
