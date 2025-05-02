@@ -10,18 +10,14 @@ WITH params AS (SELECT
 SELECT
 -- default fields:
   library.id
-, case fs_deleted 
-  	when 0 then 1 
-		when 1 then 0 
-	end 
-	AS isExists
+, fs_deleted
 , artist
 , title
 , year
 , tl.location AS url
 , duration
 , bitrate AS kbps
-, CAST(round((tl.filesize/1024) ) AS INTEGER) as KB /* 120*1024 */
+, filesize
 , album
 , IFNULL(tracknumber||'/'||tracktotal, tracknumber)AS n
 , genre

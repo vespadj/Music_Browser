@@ -1,0 +1,34 @@
+<!doctype html>
+<!-- xTable -->
+<div>
+<template x-if="table.length">
+    <div
+      id="results"
+    >
+      <table class="table-zebra border-base-300 table w-full border">
+        <thead>
+          <tr class="bg-base-200 border-base-300 border-b">
+            <template x-for="field in visibleFields" :key="field">
+              <th class="border-base-300 border-r" x-text="field"></th>
+            </template>
+          </tr>
+        </thead>
+        <tbody>
+          <template x-for="(row, index) in table" :key="row.id">
+            <tr
+              class="hover:bg-base-200 border-base-300 border-b"
+              @click="clickOnRow && xCMenu_open($event, row, clickOnRow)"
+            >
+              <template x-for="field in visibleFields" :key="field">
+                <td
+                  class="border-base-300 border-r"
+                  x-text="row[field]"
+                ></td>
+              </template>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
+  </template>
+</div>

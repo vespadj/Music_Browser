@@ -10,6 +10,7 @@
 
     <script src="app.js"></script>
     <script src="x-components/xCMenu.js"></script>
+    <script src="x-components/xTable.js"></script>
     <style>
       [x-cloak] {
         display: none !important;
@@ -252,46 +253,15 @@
 
       <!-- Results table -->
       <div id="div_results" x-data="xCMenu">
-        <template x-if="results.length">
-          <div
-            id="results"
-            x-data="{ table: results, fields: [], suffixFields: [] }"
-            x-init="fields = results_fields; 
-                      suffixFields = fields.filter((el) => !defaultFields.includes(el));
-                      $watch('results', (new_val) => {
-                        if(new_val.length){
-                          table = new_val;
-                          fields = results_fields;
-                        }});"
-          >
-            <table class="table-zebra border-base-300 table w-full border">
-              <thead>
-                <tr class="bg-base-200 border-base-300 border-b">
-                  <template x-for="field in fields" :key="field">
-                    <th class="border-base-300 border-r" x-text="field"></th>
-                  </template>
-                </tr>
-              </thead>
-              <tbody>
-                <template x-for="(row, index) in table" :key="row.id">
-                  <tr
-                    class="hover:bg-base-200 border-base-300 border-b"
-                    @click="xCMenu_open($event, row, 'music_track')"
-                  >
-                    <template x-for="field in fields" :key="field">
-                      <td
-                        class="border-base-300 border-r"
-                        x-text="row[field]"
-                      ></td>
-                    </template>
-                  </tr>
-                </template>
-              </tbody>
-            </table>
-          </div>
-        </template>
-
         <div x-html="xCMenu.html"></div>
+        <div
+          x-data="xTable(
+            {table: results
+            , hiddenFields: ['id', 'fs_deleted']
+            , clickOnRow: 'music_track'
+            })"
+          x-html="html"
+        ></div>
       </div>
 
       <p id="cont" class="mt-4">

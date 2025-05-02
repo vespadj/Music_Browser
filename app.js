@@ -146,7 +146,7 @@ document.addEventListener('alpine:init', () => {
         'title',
         'year',
 
-        'isExists',
+        'fs_deleted', // file deleted, !isExists
         'url',
 
         'duration',
@@ -252,6 +252,8 @@ document.addEventListener('alpine:init', () => {
                   row.url = this.formatUrl(row.url)
                 }
                 row.filedate = this.formatDate(row.filedate)
+                row.duration = this.formatDuration(row.duration)
+                row.filesize = this.formatSize(row.filesize, 'MB')
               })
             }
             this.results = data.results.tab
@@ -274,6 +276,33 @@ document.addEventListener('alpine:init', () => {
         const ss = String(parsedDate.getSeconds()).padStart(2, '0')
 
         return `${yyyy}/${mm}/${dd} ${hh}:${min}` // :${ss}
+      },
+      formatDuration(duration) {
+        const hours = Math.floor(duration / 3600)
+        const minutes = Math.floor((duration % 3600) / 60)
+        const seconds = Math.floor(duration % 60)
+        if (hours === 0) {
+          return `${minutes}:${seconds.toString().padStart(2, '0')}`
+        } else {
+          return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds
+            .toString()
+            .padStart(2, '0')}`
+        }
+      },
+      formatSize(size, unit) {
+        const units = ['B', 'KB', 'MB', 'GB', 'TB']
+        let unitIndex = 0
+        let sizeInBytes = size
+        if(unit === 'MB') {
+          // omitt the unit, and return the size in integer MB
+          return (sizeInBytes/1024/1024).toFixed(2)
+        } else{
+        while (sizeInBytes >= 1024 && unitIndex < units.length - 1) {
+          sizeInBytes /= 1024
+          unitIndex++
+        }
+          return `${sizeInBytes.toFixed(2)} ${units[unitIndex]}`
+        }
       },
       formatUrl(urltxt) {
         // TODO: Add validation for this.rootOld and this.rootNew before string replacement
