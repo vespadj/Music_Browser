@@ -1,11 +1,13 @@
 <!doctype html>
 <!-- xTable -->
 <div>
-<template x-if="table.length">
-    <div
-      id="results"
-    >
-      <table class="table-zebra border-base-300 table w-full border">
+  <template x-if="table.length">
+    <div id="results"> 
+      <!--
+      overflow-x-auto not seem so smart 
+      https://tailwindcss.com/docs/overflow#scrolling-horizontally-if-needed
+      -->
+      <table class="table table-zebra border border-base-300 w-full">
         <thead>
           <tr class="bg-base-200 border-base-300 border-b">
             <template x-for="field in visibleFields" :key="field">
@@ -20,10 +22,7 @@
               @click="clickOnRow && xCMenu_open($event, row, clickOnRow)"
             >
               <template x-for="field in visibleFields" :key="field">
-                <td
-                  class="border-base-300 border-r"
-                  x-text="row[field]"
-                ></td>
+                <td class="border-base-300 border-r" x-text="row[field]"></td>
               </template>
             </tr>
           </template>

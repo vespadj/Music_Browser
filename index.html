@@ -115,7 +115,17 @@
                 </div>
               </div>
             </div>
-            <div class="flex items-center space-x-2">
+            <div class="flex flex-col space-y-2">
+
+              <label class="label cursor-pointer">
+                <input
+                  type="checkbox"
+                  x-model="$store.readonly_mode.on"
+                  class="checkbox checkbox-primary"
+                />
+                <span class="label-text">Read Only mode</span>
+              </label>
+
               <label class="label hidden cursor-pointer">
                 <!-- TODO: dndf, For Windows Only -->
                 <input

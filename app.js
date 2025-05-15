@@ -8,7 +8,7 @@ function xCMenu_getItemsByField(field) {
 
   if (['music_track'].includes(field.toLowerCase())) {
     // TODO: fix - for Windows.
-    if (false && Alpine.store('dndf') && Alpine.store('dndf').on) {
+    if (Alpine.store('dndf') && Alpine.store('dndf').on) {
       items.push({
         name: 'dndf',
       })
@@ -43,16 +43,18 @@ function xCMenu_getItemsByField(field) {
       },
     })
 
-    items.push({
-      name: 'Add to Mixxx AutoDJ',
-      icon: '<iconify-icon icon="mdi:robot-happy-outline" width="1rem" height="1rem"></iconify-icon>',
-      exec: (row) => {
-        fetch(
-          'action.lsp?action=AddToMixxxAutoDJ&track_id=' +
+    if(Alpine.store('readonly_mode') && Alpine.store('readonly_mode').on == false){
+      items.push({
+        name: 'Add to Mixxx AutoDJ',
+        icon: '<iconify-icon icon="mdi:robot-happy-outline" width="1rem" height="1rem"></iconify-icon>',
+        exec: (row) => {
+          fetch(
+            'action.lsp?action=AddToMixxxAutoDJ&track_id=' +
             encodeURIComponent(row.id)
-        )
-      },
-    })
+          )
+        },
+      })
+    }
 
     // TODO: Optimize OS Players
     if (false) {
@@ -113,6 +115,9 @@ document.addEventListener('alpine:init', () => {
   // If you want to use $persist with Alpine.data, you need to use a standard function instead of an arrow function
   Alpine.store('dndf', {
     on: Alpine.$persist(false).as('dndf_on'),
+  })
+  Alpine.store('readonly_mode', {
+    on: Alpine.$persist(false).as('readonly_mode_on'),
   })
   Alpine.store('theme', {
     current: Alpine.$persist('light').as('theme_current'),

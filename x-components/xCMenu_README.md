@@ -2,6 +2,10 @@
 
 A lightweight contextual menu component built with Alpine.js and daisyUI.
 
+## Author
+
+vespadj
+
 ## Features
 
 - Right-click context menu for data tables

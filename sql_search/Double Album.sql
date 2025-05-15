@@ -14,7 +14,9 @@ SELECT
 , comment
 , datetime_added AS filedate
 
+, key
 , bpm
+, rating
 
 FROM library as l
 

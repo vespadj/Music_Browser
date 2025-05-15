@@ -22,7 +22,9 @@ SELECT
 , datetime_added AS filedate
 
 -- other fields:
+, key
 , bpm
+, rating
 
 
 FROM
