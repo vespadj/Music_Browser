@@ -11,8 +11,9 @@
 * pagination
 * field customization
 * field actions xCMenu
-* show/hide fields
+* show/hide fields, (add all avaible, bpm key, etc...)
 * NO: overflow-x
+* best zebra colors.
 
 ## Spotify API
 
