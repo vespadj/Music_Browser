@@ -33,9 +33,9 @@ end
 -- === end user settings ===
 
 local action, url, params, track_id = request:data('action', 'url', 'params', 'track_id')
--- trace(action, url, params)
+-- trace(action, url, params, track_id)
 url = ba.urldecode(url or '')
-track_id = tonumber(ba.urldecode(track_id)) or 0
+track_id = tonumber(ba.urldecode(track_id or 0)) or 0
 
 
 -- FUNCTIONS
