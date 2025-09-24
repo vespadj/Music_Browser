@@ -1,0 +1,6 @@
+name: MDN JavaScript Documentation
+version: 0.0.1
+schema: v1
+docs:
+  - name: MDN JavaScript Documentation
+    startUrl: https://developer.mozilla.org/en-US/docs/Web/JavaScript

@@ -1,0 +1,6 @@
+name: DaisyUI
+version: 5.0
+schema: v1
+docs:
+  - name: DaisyUI Documentation
+    startUrl: https://daisyui.com/
