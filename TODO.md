@@ -15,7 +15,9 @@
 * NO: overflow-x
 * best zebra colors.
 
-## Spotify API
+## NO: Spotify API
+
+**[See: Mixxx PR 15209](https://github.com/mixxxdj/mixxx/pull/15209)**
 
 * access to user Playlists on Spotify
 * copy: Artist - Title

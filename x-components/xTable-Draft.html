@@ -1,0 +1,150 @@
+<!-- TODO: iconify plugin?  material-symbols-light:table-eye-outline -->
+<span
+  title="Colonne visualizzate"
+  bak-class="icon-[material-symbols-light--table-eye-outline] w-12 h-12 mx-2 inline-flex items-center hover:text-blue-500"
+  class="mx-2 inline-flex h-12 w-12 items-center hover:text-blue-500"
+  x-show="app_var.filtro_clienti"
+  @click="ricerca_clienti_espandi_colonne_visualizzate = !ricerca_clienti_espandi_colonne_visualizzate"
+  ><svg
+    class="h-full w-auto"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+  >
+    <path
+      fill="currentColor"
+      d="M5.616 20q-.667 0-1.141-.475T4 18.386V5.615q0-.666.475-1.14T5.615 4h12.77q.666 0 1.14.475T20 5.615v7.94q-.244-.12-.486-.228q-.241-.107-.514-.19v-2.983h-3.998v2.615q-.275.025-.515.056q-.24.03-.485.098v-2.77H9.998v4.41q-.138.104-.262.234t-.228.28H5v3.308q0 .269.173.442t.443.173h2.107q.154.28.317.521q.162.24.333.479zM5 14.077h3.998v-3.923H5zm0-4.923h14V5.616q0-.27-.173-.443T18.385 5H5.615q-.269 0-.442.173T5 5.616zM16.134 22q-1.832 0-3.382-.94t-2.483-2.521q.933-1.581 2.483-2.522t3.383-.94t3.382.94T22 18.538q-.933 1.581-2.483 2.521q-1.55.941-3.383.941m-.002-1q1.39 0 2.623-.67q1.234-.668 2.072-1.791q-.838-1.124-2.07-1.793q-1.23-.669-2.62-.669q-1.389 0-2.623.67q-1.233.669-2.072 1.792q.839 1.122 2.07 1.792t2.62.669m.005-1.461q-.416 0-.709-.292q-.294-.29-.294-.706t.292-.71t.706-.292q.416 0 .71.29t.293.707t-.291.71t-.707.293"
+    />
+  </svg>
+</span>
+
+<div
+  x-data="{
+
+    table: [],
+    fields: [],
+    fieldsExcluded: [],
+    fieldsHiddenable:['db', 'cod_cli', 'Alias', 'Nazione', 'Provincia', 'Città', 'Part_IVA', 'Macroarea', 'Area', 'Zona', 'Macrocategoria', 'Categoria', 'Sottocategoria', 'Raggruppamento_1', 'Raggruppamento_2', 'Raggruppamento_3'],
+    fieldsHidden: $persist(['db', 'cod_cli', 'Alias', 'Part_IVA', 'Macroarea', 'Area', 'Zona', 'Macrocategoria', 'Categoria', 'Sottocategoria', 'Raggruppamento_1', 'Raggruppamento_2', 'Raggruppamento_3']),
+    pagination: {total: 0, size: 25, currentPage: 1, previousSearch: ''},
+
+    // tableFilteredSortered: [],
+    get tableFilteredSortered() {
+      let tempTab = this.table;
+
+      // mainFilter
+      tempTab = tempTab.filter(item => tableFilterFunction(item, app_var.filtro_clienti));
+
+      // Regione
+      if (app_var.filtro_clienti_regione) {
+        tempTab = tempTab.filter(item => regioni.find(x => x.id === parseInt(app_var.filtro_clienti_regione)).province.find(provincia => provincia.sigla === item.Provincia) );
+      }
+
+      // Provincia
+      if (app_var.filtro_clienti_provincia) {
+        tempTab = tempTab.filter(item => item.Provincia == app_var.filtro_clienti_provincia);
+      }
+
+      // Pagination
+      if (this.pagination.previousSearch !== app_var.filtro_clienti){
+        this.pagination.currentPage = 1; // reset page on change of filter
+      }
+      this.pagination.total = tempTab.length;
+      if (this.pagination.total > this.pagination.size) {
+        tempTab = tempTab.slice(this.pagination.size * (this.pagination.currentPage-1), this.pagination.size * (this.pagination.currentPage));
+      }
+      this.pagination.previousSearch = app_var.filtro_clienti;
+
+      return tempTab;
+    },
+
+  }"
+  x-init="
+    $watch('Clienti', newObj => {
+      table = Clienti;
+      if(table.length){
+        fields = Object.keys(table[0]).filter(x=> !(fieldsExcluded.includes(x)));
+      }
+    })
+  "
+  class=""
+>
+  <!-- fix. x-collapse crea un style="overflow: hidden" che va in conflitto con le table sticky -->
+
+  <div class="mt-1 px-4">
+    <template x-if="Clienti.length">
+      <div class="text-sm" :id="$id('table')">
+        <!-- Nascondi Colonne -->
+        <div
+          class="mx-4 inline-block"
+          x-show="ricerca_clienti_espandi_colonne_visualizzate"
+        >
+          <div class="mb-2 space-y-1">
+            <span class="mr-4">Nascondi Colonne:</span>
+            <template
+              x-for="(field, indexFieldsHiddenable) in fieldsHiddenable"
+              :key="indexFieldsHiddenable"
+              ><label class="mx-2 inline-block text-neutral-900">
+                <input
+                  type="checkbox"
+                  :value="field"
+                  :checked="fieldsHidden.includes($el.value)"
+                  @change="$el.checked ? (fieldsHidden.push($el.value)) : (fieldsHidden.splice(fieldsHidden.indexOf($el.value), 1))"
+                  class="h-4 w-4 rounded border-neutral-300 bg-neutral-50 focus:ring-3 focus:ring-blue-300" />
+                <span x-text="field.replaceAll('_', ' ')"></span></label
+            ></template>
+          </div>
+        </div>
+
+        <!-- Tabella Vista Clienti -->
+        <table
+          class="overflow-x-auto relative min-w-full border-collapse border border-gray-200"
+        >
+          <thead>
+            <tr>
+              <template x-for="(field, indexF) in fields" :key="indexF">
+                <th
+                  class="sticky top-0 border border-gray-200 bg-gray-100 px-2 py-1"
+                  x-text="field.replaceAll('_', ' ')"
+                  x-show="!fieldsHidden.includes(field)"
+                ></th>
+              </template>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-gray-200">
+            <template
+              x-for="(row, index) in tableFilteredSortered"
+              :key="index"
+            >
+              <tr class="odd:bg-gray-50 hover:bg-gray-100">
+                <template
+                  x-for="(field, indexTdClienti) in fields"
+                  :key="indexTdClienti"
+                >
+                  <td
+                    class="border-x px-2 py-1"
+                    x-show="!fieldsHidden.includes(field)"
+                    x-html="formatTD($el, field, row[field], row, $data)"
+                    bak-@click="xCMenu_open($event, row, field)"
+                  ></td>
+                </template>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+    </template>
+  </div>
+
+  <!-- Pagination (Component) -->
+  <!-- NB: va fuori dal x-if se no si duplica a ogni inizializzazione -->
+  <!-- TODO: migliorabile, si può aggiungere la proprietà loading per evitare "Nessun risultato" mentre si carica -->
+  <div
+    x-show="true"
+    id="pagination"
+    x-ref="pagination"
+    class="mx-auto grid h-14 place-items-center"
+    x-data="Alpine.store('pagination')"
+    x-init="await fetch('/x-components/pagination.html').then(x=>x.text()).then(html=>$refs.pagination.innerHTML=html)"
+  ></div>
+</div>

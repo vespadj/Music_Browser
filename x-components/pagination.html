@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<!-- Pagination component in Alpinejs-->
+<!-- Author: vespadj, coping from: https://alpinetoolbox.com/examples/pagination -->
+
+<!-- on index.html, the parent div must be have the attr. x - data = "pagination"
+where pagination = {total:0, size:50, currentPage:0}
+
+il cambio pagina (query) è gestito da un $watch in forum(.new).js
+-->
+
+<div
+  id="pagination_component"
+  class="flex flex-wrap float-root justify-between items-center text-sm leading-5 text-gray-700"
+  x-data="
+  {
+    //Total number of pages
+    pageCount() {
+      return Math.ceil(this.total / this.size);
+    },
+
+    //Link to navigate to page
+    viewPage(index) {
+      this.currentPage = index;
+    },
+
+    //Create array of all pages (for loop to display page numbers)
+    pages() {
+      return Array.from({
+        length: Math.ceil(this.total / this.size),
+      });
+    },
+  }
+  "
+>
+  <div class="flex items-center">
+    <div class="mx-1 sm:w-auto text-center sm:text-right" x-show="total === 1">
+      <span class="font-bold" x-text="'Un'"></span><span> Risultato.</span>
+    </div>
+    <div class="mx-1 sm:w-auto text-center sm:text-right" x-show="total > 1">
+      <span x-show="!!undefinableResultCount && (total % size == 0);"
+        >Almeno
+      </span>
+      <span class="font-bold" x-text="total"></span><span> risultati.</span>
+    </div>
+
+    <!--Message to display when no results-->
+    <div
+      class="mx-auto flex items-center font-bold text-red-500"
+      x-show="total===0"
+    >
+      <svg
+        class="h-6 w-6"
+        viewBox="0 0 24 24"
+        stroke-width="2"
+        stroke="currentColor"
+        fill="none"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path stroke="none" d="M0 0h24v24H0z" />
+        <circle cx="12" cy="12" r="9" />
+        <line x1="9" y1="10" x2="9.01" y2="10" />
+        <line x1="15" y1="10" x2="15.01" y2="10" />
+        <path d="M9.5 16a10 10 0 0 1 6 -1.5" />
+      </svg>
+
+      <span class="ml-4">Nessun risultato!</span>
+    </div>
+  </div>
+
+  <div
+    x-show="pageCount() > 1 || (!!undefinableResultCount && total >= size)"
+    class="mx-auto flex justify-between items-center"
+  >
+    <span class="ml-2"> Pag.: </span>
+    <!-- |< First Button -->
+    <button
+      x-on:click="viewPage(1)"
+      x-show="currentPage > 1"
+      class="m-1 bg-gray-200 text-gray-700 p-2 rounded inline-flex items-center hover:bg-blue-200 active:bg-blue-100"
+    >
+      <svg
+        class="h-6 w-6"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polygon points="19 20 9 12 19 4 19 20"></polygon>
+        <line x1="5" y1="19" x2="5" y2="5"></line>
+      </svg>
+    </button>
+
+    <!-- < Previous Button -->
+    <button
+      x-on:click="currentPage--"
+      x-show="currentPage > 2"
+      class="m-1 bg-gray-200 text-gray-700 p-2 rounded inline-flex items-center hover:bg-blue-200 active:bg-blue-100"
+    >
+      <svg
+        class="h-6 w-6"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+
+    <!-- Display page numbers -->
+    <span x-text="currentPage" class="px-2 text-black font-bold"></span>
+
+    <!-- OLD: Display page numbers -->
+    <template xxx-for="(page,index) in pages()" :key="index">
+      <button
+        class="px-3 py-2 rounded"
+        xx:class="{ 'bg-black text-white font-bold' : index === currentPage }"
+        type="button"
+        xxx-on:click="viewPage(index)"
+      >
+        <span xxx-text="index+1"></span>
+      </button>
+    </template>
+
+    <!--Next Button-->
+    <button
+      x-on:click="currentPage++"
+      x-show="(currentPage < pageCount() -1) || (!!undefinableResultCount && (currentPage <= Math.ceil((total+2)/size) - 1 ))"
+      class="m-1 bg-gray-200 text-gray-700 p-2 rounded inline-flex items-center hover:bg-blue-200 active:bg-blue-100"
+    >
+      <svg
+        class="h-6 w-6"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+
+    <!--Last Button-->
+    <button
+      class="m-1 bg-gray-200 text-gray-700 p-2 rounded inline-flex items-center hover:bg-blue-200 active:bg-blue-100"
+      x-on:click="viewPage(pageCount())"
+      x-show="currentPage < pageCount() && !!!undefinableResultCount"
+    >
+      <svg
+        class="h-6 w-6"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polygon points="5 4 15 12 5 20 5 4"></polygon>
+        <line x1="19" y1="5" x2="19" y2="19"></line>
+      </svg>
+    </button>
+  </div>
+
+    <!-- Elementi per pagina dropdown -->
+    <div class="float-right mr-2 ml-4 flex items-center">
+      <span class="mr-2">Elementi per pagina</span>
+      <select
+        x-model.number="size"
+        @change="currentPage = 1"
+        class="bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        <option value="20">20</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+        <option value="200">200</option>
+      </select>
+    </div>
+    
+</div>
+
+<script>
+  // scritto qui non va!
+  function load_component_pagination() {
+    return {
+      //Create array of all pages (for loop to display page numbers)
+      pages() {
+        return Array.from({
+          length: Math.ceil(this.total / this.size),
+        });
+      },
+
+      //Total number of pages
+      pageCount() {
+        return Math.ceil(this.total / this.size);
+      },
+
+      //Link to navigate to page
+      viewPage(index) {
+        this.currentPage = index;
+      },
+    };
+  }
+</script>
