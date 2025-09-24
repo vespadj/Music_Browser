@@ -6,8 +6,7 @@ npm install -D tailwindcss @tailwindcss/postcss postcss
 npm install -D postcss-loader
 npm install -D laravel-mix
 
-npm i -D daisyui@beta
-# npm i -D daisyui@latest
+npm i -D daisyui@latest
 
 npm i prismjs
 npm i babel-plugin-prismjs
