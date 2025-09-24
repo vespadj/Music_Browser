@@ -76,10 +76,9 @@
             <select
               class="select select-sm select-bordered border-base-300 flex-1"
               x-model="$store.theme.current"
-              test-x-init="/* Force */ $nextTick(() => { $el._x_model.set($store.theme.current) });"
             >
               <template x-for="theme in $store.theme.options">
-                <option :value="theme" x-text="theme"></option>
+                <option :value="theme" x-text="theme" :selected="theme===$store.theme.current"></option>
               </template>
             </select>
           </div>

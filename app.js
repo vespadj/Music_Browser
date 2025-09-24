@@ -8,7 +8,7 @@ function xCMenu_getItemsByField(field) {
 
   if (['music_track'].includes(field.toLowerCase())) {
     // TODO: fix - for Windows.
-    if (Alpine.store('dndf') && Alpine.store('dndf').on) {
+    if (false && Alpine.store('dndf') && Alpine.store('dndf').on) {
       items.push({
         name: 'dndf',
       })
@@ -122,6 +122,11 @@ document.addEventListener('alpine:init', () => {
   Alpine.store('theme', {
     current: Alpine.$persist('light').as('theme_current'),
     options: daisyuiThemes,
+    init() {
+      if (!this.options.includes(this.current)) {
+        this.current = this.options[0];
+      }
+    }
   })
 
   Alpine.data('musicBrowser', function () {
