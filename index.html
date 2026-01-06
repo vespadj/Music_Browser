@@ -21,7 +21,7 @@
   <body
     x-data="musicBrowser"
     class="bg-base-100 min-h-screen min-w-screen text-sm"
-    bak-cloak
+    x-cloak
     x-bind:data-theme="$store.theme.current"
   >
     <!-- Dependencies -->
@@ -30,25 +30,20 @@
         0,
         document.location.pathname.lastIndexOf('/')
       )
-      fetch('mix-manifest.json?' + Date.now())
+      fetch('manifest.json?' + Date.now())
         .then((x) => x.json())
         .then((json) => {
-          links = Object.values(json).filter((txt) => txt.indexOf('.css') > 0)
-          scripts = Object.values(json).filter((txt) => txt.indexOf('.js') > 0)
-          links.forEach((element) => {
-            var link = document.createElement('link')
-            link.rel = 'stylesheet'
-            link.href = base_path + element
-            document.body.appendChild(link)
-          })
-          scripts.forEach((element) => {
-            if (!['tinymce'].includes(element)) {
-              var script = document.createElement('script')
-              script.deref = true
-              script.src = base_path + element
-              document.body.appendChild(script)
-            }
-          })
+          let element = json['src/main.js'].file
+          var script = document.createElement('script')
+          script.deref = true
+          script.src = base_path + '/dist/' + element
+          document.body.appendChild(script)
+
+          let stylefile = json['src/styles.css'].file
+          var link = document.createElement('link')
+          link.rel = 'stylesheet'
+          link.href = base_path + '/dist/' + stylefile
+          document.body.appendChild(link)
         })
     </script>
 
@@ -78,7 +73,11 @@
               x-model="$store.theme.current"
             >
               <template x-for="theme in $store.theme.options">
-                <option :value="theme" x-text="theme" :selected="theme===$store.theme.current"></option>
+                <option
+                  :value="theme"
+                  x-text="theme"
+                  :selected="theme===$store.theme.current"
+                ></option>
               </template>
             </select>
           </div>
@@ -115,7 +114,6 @@
               </div>
             </div>
             <div class="flex flex-col space-y-2">
-
               <label class="label cursor-pointer">
                 <input
                   type="checkbox"

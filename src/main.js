@@ -20,6 +20,11 @@ window.daisyuiThemes = daisyuiThemes
 
 import "iconify-icon"
 
+import Prism from 'prismjs';
+window.Prism = Prism
+window.Prism.manual = true;
+window.Prism.highlightAll();
+
 import Alpine from 'alpinejs';
 // import collapse from '@alpinejs/collapse'
 import focus from '@alpinejs/focus'
@@ -33,14 +38,5 @@ window.Alpine = Alpine
 
 Alpine.start()
 
-import * as Prism from 'prismjs';
-window.Prism = Prism
-Prism.manual = true;
-Prism.highlightAll();
-/*
-*/
-
-// Put 'src/index.js' link in:
-//   \webpack.mix.js
-// Then build with:
-//   \>npx mix build --production
+// To compile:
+// npx vite build

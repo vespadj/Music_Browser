@@ -1,9 +1,13 @@
+@import 'prismjs/themes/prism-twilight.css';
+@import 'prismjs/plugins/line-numbers/prism-line-numbers.css';
+
 @import 'tailwindcss';
 @plugin "daisyui" {
   themes:
     corporate, cmyk, emerald, light, dark, abyss, business, dim,
     dracula, forest, sunset;
 }
+
 /* ! "daisyuiThemes" must be defined also in src/main.js */
 /* not good:
 pastel    bad rendering for xCMenu
